@@ -196,7 +196,7 @@
 &flexspi1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexspi1>;
-	status = "okay";
+	status = "disabled";
 
 	flash@0 {
 		compatible = "jedec,spi-nor";
@@ -212,11 +212,15 @@
 	};
 };
 
+&gpio2 {
+	status = "disabled";
+};
+
 &lpi2c4 {
 	clock-frequency = <400000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpi2c4>;
-	status = "okay";
+	status = "disabled";
 
 	wm8962: audio-codec@1a {
 		compatible = "wlf,wm8962";
@@ -258,7 +262,7 @@
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpi2c5>;
-	status = "okay";
+	status = "disabled";
 
 	i2c5_pcal6408: gpio@21 {
 		compatible = "nxp,pcal6408";
@@ -273,7 +277,7 @@
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpi2c6>;
-	status = "okay";
+	status = "disabled";
 
 	i2c6_pcal6416: gpio@21 {
 		compatible = "nxp,pcal6416";
@@ -294,7 +298,7 @@
 	clock-frequency = <1000000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpi2c7>;
-	status = "okay";
+	status = "disabled";
 
 	i2c7_pcal6524: i2c7-gpio@22 {
 		compatible = "nxp,pcal6524";
