@@ -54,8 +54,8 @@ struct tcpc_port_config portpd_config = {
 };
 #else
 struct tcpc_port_config port_config = {
-	.i2c_bus = 6, /* i2c7 */
-	.addr = 0x50,
+	.i2c_bus = 1, /* i2c2 */
+	.addr = 0x51,
 	.port_type = TYPEC_PORT_DRP,
 	.disable_pd = true,
 };
@@ -446,6 +446,10 @@ int board_init(void)
 
 #if defined(CONFIG_USB_TCPC)
 	setup_typec();
+#endif
+
+#if IS_ENABLED(CONFIG_TARGET_IMX95_19X19_EVK)
+	netc_regulator_enable("regulator-m2-pwr", true);
 #endif
 
 	netc_init();
