@@ -52,10 +52,24 @@ struct tcpc_port_config portpd_config = {
 	.max_snk_mw = 15000,
 	.op_snk_mv = 9000,
 };
-#else
+#elif defined(CONFIG_TARGET_IMX95_NAVQA)
 struct tcpc_port_config port_config = {
 	.i2c_bus = 1, /* i2c2 */
 	.addr = 0x51,
+	.port_type = TYPEC_PORT_DRP,
+	.disable_pd = true,
+};
+#elif defined(CONFIG_TARGET_IMX95_NAVQB)
+struct tcpc_port_config port_config = {
+	.i2c_bus = 2, /* i2c3 */
+	.addr = 0x50,
+	.port_type = TYPEC_PORT_DRP,
+	.disable_pd = true,
+};
+#else
+struct tcpc_port_config port_config = {
+	.i2c_bus = 6, /* i2c7 */
+	.addr = 0x50,
 	.port_type = TYPEC_PORT_DRP,
 	.disable_pd = true,
 };
@@ -338,6 +352,8 @@ void netc_init(void)
 #ifdef CONFIG_TARGET_IMX95_15X15_EVK
 	netc_phy_rst("gpio@22_4", "ENET1_RST_B");
 	netc_phy_rst("gpio@22_5", "ENET2_RST_B");
+#elif defined(CONFIG_TARGET_IMX95_NAVQB)
+	netc_phy_rst("i2c3_io@21_1", "ENET1_RST_B");
 #else
 	netc_phy_rst("i2c5_io@21_2", "ENET1_RST_B");
 
@@ -448,7 +464,7 @@ int board_init(void)
 	setup_typec();
 #endif
 
-#if IS_ENABLED(CONFIG_TARGET_IMX95_19X19_EVK)
+#if IS_ENABLED(CONFIG_TARGET_IMX95_19X19_EVK) || IS_ENABLED(CONFIG_TARGET_IMX95_NAVQA)
 	netc_regulator_enable("regulator-m2-pwr", true);
 #endif
 

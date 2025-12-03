@@ -40,11 +40,6 @@
 		serial0 = &lpuart1;
 	};
 
-	bt_sco_codec: audio-codec-bt-sco {
-		#sound-dai-cells = <1>;
-		compatible = "linux,bt-sco";
-	};
-
 	chosen {
 		stdout-path = &lpuart1;
 	};
@@ -52,13 +47,6 @@
 	memory@80000000 {
 		device_type = "memory";
 		reg = <0x0 0x80000000 0 0x80000000>;
-	};
-
-	fan0: pwm-fan {
-		compatible = "pwm-fan";
-		#cooling-cells = <2>;
-		pwms = <&tpm6 2 4000000 PWM_POLARITY_INVERTED>;
-		cooling-levels = <64 128 192 255>;
 	};
 
 	reserved-memory {
@@ -82,53 +70,34 @@
 		regulator-name = "+V3.3_SW";
 	};
 
-	reg_audio_pwr: regulator-audio-pwr {
+	reg_pcie0: reg-pcie0 {
 		compatible = "regulator-fixed";
-		regulator-name = "audio-pwr";
+		regulator-name = "M2_KEYM_PWREN_B";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		gpio = <&i2c4_gpio_expander_21 1 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
+		gpio = <&i2c3_ioexp23 0 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+		enable-active-low;
 		regulator-always-on;
 	};
 
-	reg_audio_slot: regulator-audio-slot {
+	reg_pcie1: reg-pcie1 {
 		compatible = "regulator-fixed";
-		regulator-name = "audio-wm8962";
+		regulator-name = "M2_KEYB_PWREN_B";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		gpio = <&i2c4_gpio_expander_21 7 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
+		gpio = <&i2c3_ioexp23 2 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+		enable-active-low;
 		regulator-always-on;
-		status = "disabled";
 	};
 
-	reg_m2_pwr: regulator-m2-pwr {
+	reg_eth_rst: reg-eth-rst {
 		compatible = "regulator-fixed";
-		regulator-name = "M.2-power";
+		regulator-name = "RTL8211_PHYRST_B";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		gpio = <&i2c7_pcal6524 20 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-	};
-
-	reg_pcie0: regulator-pcie {
-		compatible = "regulator-fixed";
-		regulator-name = "PCIE_WLAN_EN";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		vin-supply = <&reg_m2_pwr>;
-		gpio = <&i2c7_pcal6524 6 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-	};
-
-	reg_slot_pwr: regulator-slot-pwr {
-		compatible = "regulator-fixed";
-		regulator-name = "PCIe slot-power";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&i2c7_pcal6524 14 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
+		gpio = <&i2c3_ioexp21 1 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+		enable-active-low;
+		regulator-always-on;
 	};
 
 	reg_usdhc2_vmmc: regulator-usdhc2 {
@@ -141,55 +110,6 @@
 		gpio = <&gpio3 7 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 		off-on-delay-us = <12000>;
-	};
-
-	sound-bt-sco {
-		compatible = "simple-audio-card";
-		simple-audio-card,name = "bt-sco-audio";
-		simple-audio-card,format = "dsp_a";
-		simple-audio-card,bitclock-inversion;
-		simple-audio-card,frame-master = <&btcpu>;
-		simple-audio-card,bitclock-master = <&btcpu>;
-
-		btcpu: simple-audio-card,cpu {
-			sound-dai = <&sai1>;
-			dai-tdm-slot-num = <2>;
-			dai-tdm-slot-width = <16>;
-		};
-
-		simple-audio-card,codec {
-			sound-dai = <&bt_sco_codec 1>;
-		};
-	};
-
-	sound-micfil {
-		compatible = "fsl,imx-audio-card";
-		model = "micfil-audio";
-
-		pri-dai-link {
-			link-name = "micfil hifi";
-			format = "i2s";
-			cpu {
-				sound-dai = <&micfil>;
-			};
-		};
-	};
-
-	sound-wm8962 {
-		compatible = "fsl,imx-audio-wm8962";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_hp>;
-		model = "wm8962-audio";
-		audio-cpu = <&sai3>;
-		audio-codec = <&wm8962>;
-		hp-det-gpio = <&gpio2 11 GPIO_ACTIVE_HIGH>;
-		audio-routing = "Headphone Jack", "HPOUTL",
-				"Headphone Jack", "HPOUTR",
-				"Ext Spk", "SPKOUTL",
-				"Ext Spk", "SPKOUTR",
-				"AMIC", "MICBIAS",
-				"IN3R", "AMIC",
-				"IN1R", "AMIC";
 	};
 };
 
@@ -216,102 +136,35 @@
 	status = "disabled";
 };
 
+&lpi2c3 {
+	clock-frequency = <400000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpi2c3>;
+	status = "okay";
+
+	i2c3_ioexp21: i2c3-gpio@21 {
+		compatible = "nxp,pcal6408";
+	    label = "i2c3_ioexp21";
+		reg = <0x21>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		status = "okay";
+	};
+
+	i2c3_ioexp23: i2c3-gpio@23 {
+		compatible = "nxp,pcal6524";
+	    label = "i2c3_ioexp23";
+		reg = <0x23>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+};
+
 &lpi2c4 {
 	clock-frequency = <400000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpi2c4>;
 	status = "disabled";
-
-	wm8962: audio-codec@1a {
-		compatible = "wlf,wm8962";
-		reg = <0x1a>;
-		clocks = <&scmi_clk IMX95_CLK_SAI3>;
-		DCVDD-supply = <&reg_audio_pwr>;
-		DBVDD-supply = <&reg_audio_pwr>;
-		AVDD-supply = <&reg_audio_pwr>;
-		CPVDD-supply = <&reg_audio_pwr>;
-		MICVDD-supply = <&reg_audio_pwr>;
-		PLLVDD-supply = <&reg_audio_pwr>;
-		SPKVDD1-supply = <&reg_audio_pwr>;
-		SPKVDD2-supply = <&reg_audio_pwr>;
-		gpio-cfg = < 0x0000 /* 0:Default */
-			     0x0000 /* 1:Default */
-			     0x0000 /* 2:FN_DMICCLK */
-			     0x0000 /* 3:Default */
-			     0x0000 /* 4:FN_DMICCDAT */
-			     0x0000 /* 5:Default */
-			   >;
-	};
-
-	i2c4_gpio_expander_21: gpio@21 {
-		compatible = "nxp,pcal6408";
-		reg = <0x21>;
-		#gpio-cells = <2>;
-		gpio-controller;
-		interrupt-controller;
-		#interrupt-cells = <2>;
-		interrupt-parent = <&gpio2>;
-		interrupts = <18 IRQ_TYPE_LEVEL_LOW>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_i2c4_pcal6408>;
-		vcc-supply = <&reg_3p3v>;
-	};
-};
-
-&lpi2c5 {
-	clock-frequency = <100000>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpi2c5>;
-	status = "disabled";
-
-	i2c5_pcal6408: gpio@21 {
-		compatible = "nxp,pcal6408";
-		reg = <0x21>;
-		gpio-controller;
-		#gpio-cells = <2>;
-		vcc-supply = <&reg_3p3v>;
-	};
-};
-
-&lpi2c6 {
-	clock-frequency = <100000>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpi2c6>;
-	status = "disabled";
-
-	i2c6_pcal6416: gpio@21 {
-		compatible = "nxp,pcal6416";
-		reg = <0x21>;
-		gpio-controller;
-		#gpio-cells = <2>;
-		interrupt-controller;
-		#interrupt-cells = <2>;
-		interrupt-parent = <&gpio4>;
-		interrupts = <28 IRQ_TYPE_LEVEL_LOW>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_pcal6416>;
-		vcc-supply = <&reg_3p3v>;
-	};
-};
-
-&lpi2c7 {
-	clock-frequency = <1000000>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpi2c7>;
-	status = "disabled";
-
-	i2c7_pcal6524: i2c7-gpio@22 {
-		compatible = "nxp,pcal6524";
-		reg = <0x22>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_i2c7_pcal6524>;
-		gpio-controller;
-		#gpio-cells = <2>;
-		interrupt-controller;
-		#interrupt-cells = <2>;
-		interrupt-parent = <&gpio5>;
-		interrupts = <16 IRQ_TYPE_LEVEL_LOW>;
-	};
 };
 
 &lpuart1 {
@@ -345,7 +198,7 @@
 &pcie0 {
 	pinctrl-0 = <&pinctrl_pcie0>;
 	pinctrl-names = "default";
-	reset-gpio = <&i2c7_pcal6524 5 GPIO_ACTIVE_LOW>;
+	reset-gpio = <&i2c3_ioexp23 1 GPIO_ACTIVE_LOW>;
 	vpcie-supply = <&reg_pcie0>;
 	status = "okay";
 };
@@ -353,8 +206,8 @@
 &pcie1 {
 	pinctrl-0 = <&pinctrl_pcie1>;
 	pinctrl-names = "default";
-	reset-gpio = <&i2c7_pcal6524 16 GPIO_ACTIVE_LOW>;
-	vpcie-supply = <&reg_slot_pwr>;
+	reset-gpio = <&i2c3_ioexp23 3 GPIO_ACTIVE_LOW>;
+	vpcie-supply = <&reg_pcie1>;
 	status = "okay";
 };
 
@@ -464,12 +317,6 @@
 	pinctrl_i2c4_pcal6408: i2c4pcal6498grp {
 		fsl,pins = <
 			IMX95_PAD_GPIO_IO18__GPIO2_IO_BIT18			0x31e
-		>;
-	};
-
-	pinctrl_i2c7_pcal6524: i2c7pcal6524grp {
-		fsl,pins = <
-			IMX95_PAD_GPIO_IO36__GPIO5_IO_BIT16			0x31e
 		>;
 	};
 
@@ -690,23 +537,6 @@
 				temperature = <75000>;
 				hysteresis = <2000>;
 				type = "active";
-			};
-		};
-
-		cooling-maps {
-			map1 {
-				trip = <&atrip2>;
-				cooling-device = <&fan0 0 1>;
-			};
-
-			map2 {
-				trip = <&atrip3>;
-				cooling-device = <&fan0 1 2>;
-			};
-
-			map3 {
-				trip = <&atrip4>;
-				cooling-device = <&fan0 2 3>;
 			};
 		};
 	};
