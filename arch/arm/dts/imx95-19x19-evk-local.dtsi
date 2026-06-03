@@ -12,6 +12,8 @@
 		spi0 = &flexspi1;
 		usb0 = &usb3_dwc3;
 		usb1 = &usb2;
+		pci0 = &pcie_4ca00000;
+		pci1 = &pcie_4cb00000;
 	};
 
 	chosen {

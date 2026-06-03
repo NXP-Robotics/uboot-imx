@@ -195,6 +195,18 @@ config TARGET_VERDIN_IMX95_19X19
 	select IMX_SM_LMM
 	select IMX_SM_CPU
 
+config TARGET_IMX95_NAVQA
+	bool "imx95_navqa"
+	select IMX95
+	imply BOOTSTD_BOOTCOMMAND
+	imply BOOTSTD_FULL
+
+config TARGET_IMX95_NAVQB
+	bool "imx95_navqb"
+	select IMX95
+	imply BOOTSTD_BOOTCOMMAND
+	imply BOOTSTD_FULL
+
 config TARGET_IMX95_15X15_EVK
 	bool "imx95_15x15_evk"
 	select IMX95
