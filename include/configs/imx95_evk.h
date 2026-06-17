@@ -23,8 +23,18 @@
 #define PHYS_SDRAM_2_SIZE		0x380000000 /* 14GB (Totally 16GB) */
 #endif
 
-#define CFG_SYS_SECURE_SDRAM_BASE	0x8A000000 /* Secure DDR region for A55, SPL could use first 2MB */
-#define CFG_SYS_SECURE_SDRAM_SIZE	0x06000000
+#if defined(CONFIG_TARGET_IMX95_NAVQA) || defined(CONFIG_TARGET_IMX95_NAVQB)
+/* NavQ SPL runs from DDR at 0x88240000 (lpboot/SCMI path). Extend the
+ * secure DDR window to cover the SPL text so the MMU map set up by
+ * spl_enable_caches() in arch_cpu_init() does not leave the SPL address
+ * in an unmapped region, which would cause an immediate translation fault.
+ */
+#define CFG_SYS_SECURE_SDRAM_BASE      0x88000000
+#define CFG_SYS_SECURE_SDRAM_SIZE      0x08000000      /* 0x88000000-0x90000000 */
+#else
+#define CFG_SYS_SECURE_SDRAM_BASE      0x8A000000      /* Secure DDR region for A55, SPL could use first 2MB */
+#define CFG_SYS_SECURE_SDRAM_SIZE      0x06000000
+#endif
 
 #define WDOG_BASE_ADDR			WDG3_BASE_ADDR
 
