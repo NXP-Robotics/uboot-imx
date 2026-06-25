@@ -9,6 +9,10 @@
 	aliases {
 		ethernet0 = &enetc_port0;
 		spi0 = &flexspi1;
+		usb0 = &usb3_dwc3;
+		usb1 = &usb2;
+		pci0 = &pcie_4ca00000;
+		pci1 = &pcie_4cb00000;
 	};
 
 	chosen {
@@ -37,32 +41,6 @@
 		interrupt-parent = <&gpio3>;
 		interrupts = <26 IRQ_TYPE_EDGE_FALLING>;
 	};
-
-	ptn5110_usb3: tcpc@51 {
-		compatible = "nxp,ptn5110";
-		reg = <0x51>;
-		interrupt-parent = <&i2c2_pcal6524>;
-		interrupts = <7 IRQ_TYPE_LEVEL_LOW>;
-
-		port {
-			typec_con_ss3: endpoint {
-				remote-endpoint = <&usb3_drd_sw>;
-			};
-		};
-
-		typec_con3: connector {
-			compatible = "usb-c-connector";
-			label = "USB-C";
-			power-role = "dual";
-			data-role = "dual";
-			try-power-role = "sink";
-			source-pdos = <PDO_FIXED(5000, 3000, PDO_FIXED_USB_COMM)>;
-			sink-pdos = <PDO_FIXED(5000, 3000, PDO_FIXED_USB_COMM)
-				     PDO_VAR(5000, 20000, 3000)>;
-			op-sink-microwatt = <15000000>;
-			self-powered;
-		};
-	};
 };
 
 &lpi2c3 {
@@ -80,32 +58,6 @@
 		gpio-controller;
 		reg = <0x20>;
 		vcc-supply = <&reg_3p3v>;
-	};
-};
-
-&usb3 {
-	status = "okay";
-};
-
-&usb3_phy {
-	status = "okay";
-};
-
-&usb3_dwc3 {
-	dr_mode = "otg";
-	hnp-disable;
-	srp-disable;
-	adp-disable;
-	usb-role-switch;
-	role-switch-default-mode = "none";
-	snps,dis-u1-entry-quirk;
-	snps,dis-u2-entry-quirk;
-	status = "okay";
-
-	port {
-		usb3_drd_sw: endpoint {
-			remote-endpoint = <&typec_con_ss3>;
-		};
 	};
 };
 
