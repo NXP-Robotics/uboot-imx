@@ -91,16 +91,6 @@
 		regulator-always-on;
 	};
 
-	reg_eth_rst: reg-eth-rst {
-		compatible = "regulator-fixed";
-		regulator-name = "RTL8211_PHYRST_B";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&i2c3_ioexp21 1 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
-		enable-active-low;
-		regulator-always-on;
-	};
-
 	reg_usdhc2_vmmc: regulator-usdhc2 {
 		compatible = "regulator-fixed";
 		pinctrl-names = "default";
@@ -143,15 +133,6 @@
 	pinctrl-0 = <&pinctrl_lpi2c3>;
 	status = "okay";
 
-	i2c3_ioexp21: i2c3-gpio@21 {
-		compatible = "nxp,pcal6408";
-	    label = "i2c3_ioexp21";
-		reg = <0x21>;
-		gpio-controller;
-		#gpio-cells = <2>;
-		status = "okay";
-	};
-
 	i2c3_ioexp23: i2c3-gpio@23 {
 		compatible = "nxp,pcal6524";
 	    label = "i2c3_ioexp23";
@@ -163,8 +144,8 @@
 	ptn5110_usb3: tcpc@51 {
 		compatible = "nxp,ptn5110", "tcpci";
 		reg = <0x51>;
-		interrupt-parent = <&i2c2_pcal6524>;
-		interrupts = <7 IRQ_TYPE_LEVEL_LOW>;
+		interrupt-parent = <&gpio4>;
+		interrupts = <25 IRQ_TYPE_LEVEL_LOW>; // 25 = USB_PTN5110_ALERT_B (ENET2_RD1)
 
 		typec_con3: connector {
 			compatible = "usb-c-connector";

@@ -28,19 +28,6 @@
 	pinctrl-0 = <&pinctrl_lpi2c2>;
 	pinctrl-1 = <&pinctrl_lpi2c2>;
 	status = "okay";
-
-	i2c2_pcal6524: i2c2-gpio@21 {
-		compatible = "nxp,pcal6524";
-		reg = <0x21>;
-		gpio-controller;
-		#gpio-cells = <2>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_i2c2_ioexp21>;
-		interrupt-controller;
-		#interrupt-cells = <2>;
-		interrupt-parent = <&gpio3>;
-		interrupts = <26 IRQ_TYPE_EDGE_FALLING>;
-	};
 };
 
 &lpi2c3 {
@@ -52,12 +39,13 @@
 	pinctrl-1 = <&pinctrl_lpi2c3>;
 	status = "okay";
 
-	i2c3_gpio_expander_20: i2c3-gpio-expander@20 {
+	i2c3_ioexp21: i2c3-gpio@21 {
 		compatible = "nxp,pcal6408";
-		#gpio-cells = <2>;
+	    label = "i2c3_ioexp21";
+		reg = <0x21>;
 		gpio-controller;
-		reg = <0x20>;
-		vcc-supply = <&reg_3p3v>;
+		#gpio-cells = <2>;
+		status = "okay";
 	};
 };
 
@@ -77,7 +65,7 @@
 	ethphy0: ethernet-phy@1 {
 		reg = <1>;
 		eee-broken-1000t;
-		reset-gpios = <&i2c2_pcal6524 16 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&i2c3_ioexp21 1 GPIO_ACTIVE_LOW>;
 		reset-assert-us = <10000>;
 		reset-deassert-us = <80000>;
 	};
