@@ -22,6 +22,9 @@
 #include <asm/arch/sys_proto.h>
 #include <dm/uclass.h>
 #include <dm/uclass-internal.h>
+#include <asm/global_data.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 extern int board_fix_fdt_fuse(void *fdt);
 
@@ -397,6 +400,13 @@ int board_late_init(void)
 	env_set("sec_boot", "no");
 #ifdef CONFIG_AHAB_BOOT
 	env_set("sec_boot", "yes");
+#endif
+
+#if CONFIG_IS_ENABLED(ENV_SUPPORT)
+	if (gd->flags & GD_FLG_ENV_DEFAULT) {
+		printf("Saving default environment to MMC...\n");
+		env_save();
+	}
 #endif
 
 	return 0;
